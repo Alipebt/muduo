@@ -1,26 +1,29 @@
-#include <boost/logic/tribool.hpp>
 #include <boost/noncopyable.hpp>
+#include <memory>
+#include <vector>
+using namespace std;
 
-class Counter : boost::noncopyable
+class Observer
 {
 public:
-    Counter() : value_(0) {}
-    int64_t value() const;
-    int64_t getAndIncrease();
-
-private:
-    int64_t value_;
-    mutable MutexLock mutex_;
+    virtual ~Observer();
+    virtual void update() = 0;
 };
 
-int64_t Counter::value() const
+class Observable
 {
-    MutexLockGuard lock(mutex_);
-    return value_;
-}
-int64_t Counter::getAndIncrease()
-{
-    MutexLockGuard lock(mutex_);
-    int64_t ret = value_++;
-    return ret;
-}
+public:
+    void register_(weak_ptr<Observer> x);
+    void unregister(Observer *x);
+
+    void notifyObservers()
+    {
+        for (Observer *x : observers_) // 用x遍历数组
+        {
+            x->update();
+        }
+    }
+
+private:
+    std::vector<Observer *> observers_; // 数组
+};
