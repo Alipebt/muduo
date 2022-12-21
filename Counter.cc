@@ -14,16 +14,30 @@ class Observable
 {
 public:
     void register_(weak_ptr<Observer> x);
-    void unregister(Observer *x);
 
-    void notifyObservers()
-    {
-        for (Observer *x : observers_) // 用x遍历数组
-        {
-            x->update();
-        }
-    }
+    void notifyObservers();
 
 private:
-    std::vector<Observer *> observers_; // 数组
+    mutable int mutex_;
+    std::vector<weak_ptr<Observer>> observers_; // 数组
+    typedef std::vector<weak_ptr<Observer>>::iterator Iterator;
 };
+
+void Observable::notifyObservers()
+{
+    mutex_ = 1;
+    Iterator it = observers_.begin();
+    while (it != observers_.end())
+    {
+        shared_ptr<Observer> obj(it->lock());
+        if (obj)
+        {
+            obj->update();
+            ++it;
+        }
+        else
+        {
+            it = observers_.erase(it);
+        }
+    }
+}
