@@ -44,3 +44,17 @@
     （2）使类的const函数可以修改对象的mutable数据成员。
     
     ```
+
+4. ```c++
+
+    在构建 shared_ptr 智能指针，可以明确其指向。例如：
+    std::shared_ptr<int> p3(new int(10));
+    由此，我们就成功构建了一个 shared_ptr 智能指针，其指向一块存有 10 这个 int 类型数据的堆内存空间。
+
+    map对象是模板类，需要关键字和存储对象两个模板参数：
+    std:map<int, string> personnel;
+    这样就定义了一个用int作为索引,并拥有相关联的指向string的指针.
+
+    ```
+
+5.
