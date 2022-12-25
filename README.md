@@ -54,6 +54,8 @@
     weak_ptr是为了配合shared_ptr而引入的一种智能指针，它指向一个由shared_ptr管理的对象而不影响所指对象的生命周期，也就是将一个weak_ptr绑定到一个shared_ptr不会改变shared_ptr的引用计数。不论是否有weak_ptr指向，一旦最后一个指向对象的shared_ptr被销毁，对象就会被释放。
     当我们创建一个weak_ptr时，需要用一个shared_ptr实例来初始化weak_ptr，由于是弱共享，weak_ptr的创建并不会影响shared_ptr的引用计数值。
 
+    既然weak_ptr并不改变其所共享的shared_ptr实例的引用计数，那就可能存在weak_ptr指向的对象被释放掉这种情况。这时，我们就不能使用weak_ptr直接访问对象。那么我们如何判断weak_ptr指向对象是否存在呢？C++中提供了lock函数来实现该功能。如果对象存在，lock()函数返回一个指向共享对象的shared_ptr，否则返回一个空shared_ptr。
+
     ```
 5. ```
     map对象是模板类，需要关键字和存储对象两个模板参数：
