@@ -57,8 +57,15 @@
     既然weak_ptr并不改变其所共享的shared_ptr实例的引用计数，那就可能存在weak_ptr指向的对象被释放掉这种情况。这时，我们就不能使用weak_ptr直接访问对象。那么我们如何判断weak_ptr指向对象是否存在呢？C++中提供了lock函数来实现该功能。如果对象存在，lock()函数返回一个指向共享对象的shared_ptr，否则返回一个空shared_ptr。
 
     ```
-5. ```
+5. ```c++
     map对象是模板类，需要关键字和存储对象两个模板参数：
     std:map<int, string> personnel;
     这样就定义了一个用int作为索引,并拥有相关联的指向string的指针.
     ```
+
+6. ```c++
+    若p为智能指针对象(如：shared_ptr< int> p)
+    p.reset(q) //q为智能指针要指向的新对象
+    p.reset(); //释放p中内置的指针指向的空间
+    p.reset(q.d); //将p中内置指针换为q，并且用d来释放p之前所指的空间
+```
