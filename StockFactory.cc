@@ -68,3 +68,33 @@ private:
     mutable int mutex;
     map<string, weak_ptr<Stock>> stocks_;
 };
+
+// 测试
+void testlonglifefactory()
+{
+    shared_ptr<StockFactory> factory(new StockFactory);
+    {
+        shared_ptr<Stock> stock = factory->get("IBM");
+        shared_ptr<Stock> stock2 = factory->get("IBM");
+        assert(stock == stock2);
+        // stock在这里销毁
+    }
+    // factort在这里销毁
+}
+void testshortlifefactory()
+{
+    shared_ptr<Stock> stock;
+    {
+        shared_ptr<StockFactory> factory(new StockFactory);
+        stock = factory->get("IBM");
+        shared_ptr<Stock> stock2 = factory->get("IBM");
+        assert(stock == stock2);
+        // factort在这里销毁
+    }
+    // stock在这里销毁
+}
+int main()
+{
+    testlonglifefactory();
+    testshortlifefactory();
+}
