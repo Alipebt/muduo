@@ -42,3 +42,21 @@ private:
     pthread_mutex_t mutex_;
     pid_t holder_;
 };
+
+class MutexLockGuard : boost::noncopyable
+{
+public:
+    explicit MutexLockGuard(MutexLock &mutex) : mutex_(mutex)
+    {
+        mutex_.lock();
+    }
+    ~MutexLockGuard()
+    {
+        mutex_.unlock();
+    }
+
+private:
+    MutexLock &mutex_;
+};
+
+#define MutexLockGuard(x) static_assert(false, "missing mutex guard var name")
