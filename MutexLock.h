@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include <assert.h>
-#include <boost/thread.hpp>
+// #include <muduo/base/Mutex.h>
+#include <muduo/base/CurrentThread.h>
 
 class MutexLock
 {
@@ -17,7 +18,7 @@ public:
     }
     bool isLockedByThisThread()
     {
-        return holder_ == CurrentThread::tid();
+        return holder_ == muduo::CurrentThread::tid();
     }
     void assertLocked()
     {
@@ -26,7 +27,7 @@ public:
     void lock()
     {
         pthread_mutex_lock(&m_mutex);
-        holder_ = CurrentThread::tid();
+        holder_ = muduo::CurrentThread::tid();
     }
     void unlock()
     {
