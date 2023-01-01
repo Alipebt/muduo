@@ -58,14 +58,18 @@
 
     ```
 5. ```c++
+
     map对象是模板类，需要关键字和存储对象两个模板参数：
     std:map<int, string> personnel;
     这样就定义了一个用int作为索引,并拥有相关联的指向string的指针.
+
     ```
 
 6. ```c++
+
     若p为智能指针对象(如：shared_ptr< int> p)
     p.reset(q) //q为智能指针要指向的新对象
     p.reset(); //释放p中内置的指针指向的空间
     p.reset(q.d); //将p中内置指针换为q，并且用d来释放p之前所指的空间
+    
 ```
