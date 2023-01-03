@@ -133,3 +133,14 @@
     时，就会自动调用回调函数实现监听。
 
     ```
+
+8. ```
+
+    常见IO模型参考:
+    https://blog.csdn.net/u013256816/article/details/115388239
+    https://www.cnblogs.com/yrxing/p/14143644.html
+
+    muduo线程池的one loop per thread:
+    https://blog.csdn.net/m0_47891203/article/details/127084649?ops_request_misc=&request_id=&biz_id=102&utm_term=one%20loop%20per%20thread%E6%A8%A1%E5%9E%8B&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-2-127084649.142^v68^js_top,201^v4^add_ask,213^v2^t3_esquery_v2
+
+    ```
