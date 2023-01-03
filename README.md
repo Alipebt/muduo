@@ -76,56 +76,56 @@
 
 7. ```c++
 
-回调函数就是一个通过函数指针调用的函数。如果你把函数的指针（地址）作为参数传递给另一个函数，当这个指针被用来调用其所指向的函数时，我们就说这是回调函数。回调函数不是由该函数的实现方直接调用，而是在特定的事件或条件发生时由另外的一方调用的，用于对该事件或条件进行响应。 
+    回调函数就是一个通过函数指针调用的函数。如果你把函数的指针（地址）作为参数传递给另一个函数，当这个指针被用来调用其所指向的函数时，我们就说这是回调函数。回调函数不是由该函数的实现方直接调用，而是在特定的事件或条件发生时由另外的一方调用的，用于对该事件或条件进行响应。 
 
-回调函数机制： 
-1、定义一个函数（普通函数即可）； 
-2、将此函数的地址注册给调用者； 
-3、特定的事件或条件发生时，调用者使用函数指针调用回调函数。 
+    回调函数机制： 
+    1、定义一个函数（普通函数即可）； 
+    2、将此函数的地址注册给调用者； 
+    3、特定的事件或条件发生时，调用者使用函数指针调用回调函数。 
 
-eg:
-```c++
-#include <iostream>
-#include <vector>
-using namespace std;
-class A 
-{
-private:
-    int a = 5;
-    vector<void(*)(int)> funcs;
-public:
-    void setA(int a_);
-    void registerCallback(void(*p)(int));
-};
- 
-void display(int a) 
-{
-    cout << "a=" << a << endl;
-}
- 
-int main()
-{
-    A a1;
-    a1.registerCallback(display);
-    a1.setA(7);
-    system("pause");
-    return 0;
-}
- 
-void A::setA(int a_)
-{
-    a = a_;
-    for (int i = 0; i < funcs.size(); ++i) {
-        funcs[i](a);
+    eg:
+    ```c++
+    #include <iostream>
+    #include <vector>
+    using namespace std;
+    class A 
+    {
+    private:
+        int a = 5;
+        vector<void(*)(int)> funcs;
+    public:
+        void setA(int a_);
+        void registerCallback(void(*p)(int));
+    };
+    
+    void display(int a) 
+    {
+        cout << "a=" << a << endl;
     }
-}
- 
-void A::registerCallback(void(*p)(int))
-{
-    funcs.push_back(p);
-}
-```
+    
+    int main()
+    {
+        A a1;
+        a1.registerCallback(display);
+        a1.setA(7);
+        system("pause");
+        return 0;
+    }
+    
+    void A::setA(int a_)
+    {
+        a = a_;
+        for (int i = 0; i < funcs.size(); ++i) {
+            funcs[i](a);
+        }
+    }
+    
+    void A::registerCallback(void(*p)(int))
+    {
+        funcs.push_back(p);
+    }
+    ```
 
-这里用到了函数指针（即指向函数的指针），我们要监听A类中的成员变量a，我们定义A类的时候就增加一个将来要监听a变量的函数指针列表，并增加一个registerCallback函数用于将来添加监听者，在a变化时将监听者列表里的所有监听者都调用一遍；在使用A类对象时，我们只要把一个返回类型、参数列表（签名）符合的函数添加为回调函数即可，如上面当我们运行a1.setA(7)改变a的值时，就会调用了回调函数display，这就差不多是事件监听的思想：首先订阅事件（如这里的把display函数注册为回调函数），然后当事件（这里是a的值变化了）发生时，就会自动调用回调函数实现监听。
+    这里用到了函数指针（即指向函数的指针），我们要监听A类中的成员变量a，我们定义A类的时候就增加一个将来要监听a变量的函数指针列表，并增加一个registerCallback函数用于将来添加监听者，在a变化时将监听者列表里的所有监听者都调用一遍；在使用A类对象时，我们只要把一个返回类型、参数列表（签名）符合的函数添加为回调函数即可，如上面当我们运行a1.setA(7)改变a的值时，就会调用了回调函数display，这就差不多是事件监听的思想：首先订阅事件（如这里的把display函数注册为回调函数），然后当事件（这里是a的值变化了）发生时，就会自动调用回调函数实现监听。
 
     ```
