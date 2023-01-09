@@ -1,16 +1,26 @@
 # 笔记
 
-### 使用muduo库
+## 使用muduo库
 
-1. 编译时应链接相应的静态库
+### 1.编译时应链接相应的静态库
 
     ```
     -lmuduo_net
     -lmuduo_base
     ```
 
-2. 测试回射服务器echo
-   
+### 2.echo
+
+####  注释：
+
+1. `TcpConnection`的`peerAddress()`和`localAddress()`成员函数分别返回对方和本地的地址(以`InetAddress`对象表示IP和port)
+
+2. `TcpConnection::connected()`返回一个bool值，表明目前链接是建立还是断开，1为链接，0为断开。
+
+3. 在`onConnection()`中conn参数是`TcpConnection`对象的shared_ptr
+
+#### 测试回射服务器echo
+
    本地运行，使用`netcat`进行测试：
    
    ```shell
@@ -21,7 +31,8 @@
 
     >Netcat 介绍
     >Netcat（简称nc）是一款强大的命令行网络工具，用来在两台机器之间建立TCP/UDP连接，并通过标准的输入输出进行数据的读写
-### muduo C++
+
+## muduo C++
 
 1. ```c++
    // 基类
@@ -156,7 +167,7 @@
 
     ```
 
-### 参考
+## 参考
 
 常见IO模型参考:
 

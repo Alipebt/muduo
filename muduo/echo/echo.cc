@@ -18,10 +18,13 @@ EchoServer::EchoServer(muduo::net::EventLoop *loop,
 }
 
 void EchoServer::onConnection(const muduo::net::TcpConnectionPtr &conn)
+// 在onConnection()中conn参数是TcpConnection对象的shared_ptr
 {
   LOG_INFO << "EchoServer - " << conn->peerAddress().toIpPort() << " -> "
+           //  `TcpConnection`的`peerAddress()`和`localAddress()`成员函数分别返回对方和本地的地址(以`InetAddress`对象表示IP和port)
            << conn->localAddress().toIpPort() << " is "
            << (conn->connected() ? "UP" : "DOWN");
+  //  `TcpConnection::connected()`返回一个bool值，表明目前链接是建立还是断开，1为链接，0为断开。
 }
 
 void EchoServer::onMassage(const muduo::net::TcpConnectionPtr &conn,
