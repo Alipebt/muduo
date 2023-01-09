@@ -8,6 +8,9 @@
 
 3. 在`onConnection()`中conn参数是`TcpConnection`对象的shared_ptr
 
+4. 在onMassage()中conn参数是收到数据的那个TCP链接，buf是以及收到的数据，buf的数据会积累，直到用户取走(retrieve)数据。time是epoll_wait()的返回时间，这个时间通常比read()发生的时间略早。
+
+
 ## 使用muduo库
 
 ### 	1.编译时应链接相应的静态库
@@ -17,9 +20,13 @@
 -lmuduo_base
 ```
 
-### 	2.echo
+###     2. 日志
 
-测试回射服务器echo:
+日志可输出到`LOG_INFO`
+
+### 	3. echo
+
+测试回射服务器echo(单线程):
 
 本地运行，使用`netcat`进行测试：
 

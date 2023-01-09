@@ -30,6 +30,8 @@ void EchoServer::onConnection(const muduo::net::TcpConnectionPtr &conn)
 void EchoServer::onMassage(const muduo::net::TcpConnectionPtr &conn,
                            muduo::net::Buffer *buf,
                            muduo::Timestamp time)
+// 在onMassage()中conn参数是收到数据的那个TCP链接，buf是以及收到的数据，buf的数据会积累，直到用户取走(retrieve)数据,
+// time是epoll_wait()的返回时间，这个时间通常比read()发生的时间略早。
 {
   muduo::string msg(buf->retrieveAllAsString());
   LOG_INFO << conn->name() << " echo " << msg.size() << " bytes, "
