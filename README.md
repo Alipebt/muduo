@@ -1,13 +1,23 @@
 # 笔记
 
-### 注意
+### 使用muduo库
 
-编译时应链接相应的静态库如： 
+1. 编译时应链接相应的静态库
 
-```
--lmuduo_net
--lmuduo_base
-```
+    ```
+    -lmuduo_net
+    -lmuduo_base
+    ```
+
+2. 测试回射服务器echo
+   
+   本地运行，使用`netcat`进行测试：
+   
+   ```shell
+   
+    nc localhost post #post：2007
+
+   ```
 ### muduo C++
 
 1. ```c++
