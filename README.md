@@ -1,5 +1,11 @@
 # 笔记
 
+### 注意
+
+编译时应链接相应的静态库如： 
+-lmuduo_net
+-lmuduo_base
+
 ### muduo C++
 
 1. ```c++
