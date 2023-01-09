@@ -1,17 +1,6 @@
 # 笔记
 
-## 使用muduo库
-
-### 1.编译时应链接相应的静态库
-
-    ```
-    -lmuduo_net
-    -lmuduo_base
-    ```
-
-### 2.echo
-
-####  注释：
+##  注释：
 
 1. `TcpConnection`的`peerAddress()`和`localAddress()`成员函数分别返回对方和本地的地址(以`InetAddress`对象表示IP和port)
 
@@ -19,18 +8,27 @@
 
 3. 在`onConnection()`中conn参数是`TcpConnection`对象的shared_ptr
 
-#### 测试回射服务器echo
+## 使用muduo库
 
-   本地运行，使用`netcat`进行测试：
-   
+### 	1.编译时应链接相应的静态库
+
+```shell
+-lmuduo_net
+-lmuduo_base
+```
+
+### 	2.echo
+
+测试回射服务器echo:
+
+本地运行，使用`netcat`进行测试：
+
    ```shell
-
     nc localhost post #post：2007
-
    ```
 
-    >Netcat 介绍
-    >Netcat（简称nc）是一款强大的命令行网络工具，用来在两台机器之间建立TCP/UDP连接，并通过标准的输入输出进行数据的读写
+> Netcat 介绍
+> Netcat（简称nc）是一款强大的命令行网络工具，用来在两台机器之间建立TCP/UDP连接，并通过标准的输入输出进行数据的读写
 
 ## muduo C++
 
@@ -79,16 +77,16 @@
     ```
 
 4. ```c++
-
+    
     在构建 shared_ptr 智能指针，可以明确其指向。例如：
     std::shared_ptr<int> p3(new int(10));
     由此，我们就成功构建了一个 shared_ptr 智能指针，其指向一块存有 10 这个 int 类型数据的堆内存空间。
-
+    
     weak_ptr是为了配合shared_ptr而引入的一种智能指针，它指向一个由shared_ptr管理的对象而不影响所指对象的生命周期，也就是将一个weak_ptr绑定到一个shared_ptr不会改变shared_ptr的引用计数。不论是否有weak_ptr指向，一旦最后一个指向对象的shared_ptr被销毁，对象就会被释放。
     当我们创建一个weak_ptr时，需要用一个shared_ptr实例来初始化weak_ptr，由于是弱共享，weak_ptr的创建并不会影响shared_ptr的引用计数值。
-
+    
     既然weak_ptr并不改变其所共享的shared_ptr实例的引用计数，那就可能存在weak_ptr指向的对象被释放掉这种情况。这时，我们就不能使用weak_ptr直接访问对象。那么我们如何判断weak_ptr指向对象是否存在呢？C++中提供了lock函数来实现该功能。如果对象存在，lock()函数返回一个指向共享对象的shared_ptr，否则返回一个空shared_ptr。
-
+    
     ```
 5. ```c++
 
@@ -108,15 +106,15 @@
     ```
 
 7. ```c++
-
+    
     回调函数就是一个通过函数指针调用的函数。如果你把函数的指针（地址）作为参数传递给另一个函数，当这个指针被用来调用其所指向的函数时，我们就说这是回调函数。
     回调函数不是由该函数的实现方直接调用，而是在特定的事件或条件发生时由另外的一方调用的，用于对该事件或条件进行响应。 
-
+    
     回调函数机制： 
     1、定义一个函数（普通函数即可）； 
     2、将此函数的地址注册给调用者； 
     3、特定的事件或条件发生时，调用者使用函数指针调用回调函数。 
-
+    
     eg:
     
     #include <iostream>
@@ -159,12 +157,12 @@
         funcs.push_back(p);
     }
     
-
+    
     这里用到了函数指针（即指向函数的指针），我们要监听A类中的成员变量a，我们定义A类的时候就增加一个将来要监听a变量的函数指针列表，并增加一个registerCallback函数用于将来
     添加监听者，在a变化时将监听者列表里的所有监听者都调用一遍；在使用A类对象时，我们只要把一个返回类型、参数列表（签名）符合的函数添加为回调函数即可，如上面当我们运行a1.
     setA(7)改变a的值时，就会调用了回调函数display，这就差不多是事件监听的思想：首先订阅事件（如这里的把display函数注册为回调函数），然后当事件（这里是a的值变化了）发生
     时，就会自动调用回调函数实现监听。
-
+    
     ```
 
 ## 参考
@@ -177,4 +175,3 @@
 muduo线程池的one loop per thread:
 
 <https://blog.csdn.net/m0_47891203/article/details/127084649?ops_request_misc=&request_id=&biz_id=102&utm_term=one%20loop%20per%20thread%E6%A8%A1%E5%9E%8B&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-2-127084649.142^v68^js_top,201^v4^add_ask,213^v2^t3_esquery_v2>
-
