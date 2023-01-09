@@ -4,11 +4,13 @@
 
 1. `TcpConnection`的`peerAddress()`和`localAddress()`成员函数分别返回对方和本地的地址(以`InetAddress`对象表示IP和port)
 
-2. `TcpConnection::connected()`返回一个bool值，表明目前链接是建立还是断开，1为链接，0为断开。
+2. `TcpConnection::connected()`返回一个`bool`值，表明目前链接是建立还是断开，1为链接，0为断开。
 
-3. 在`onConnection()`中conn参数是`TcpConnection`对象的shared_ptr
+3. 在`onConnection()`中conn参数是`TcpConnection`对象的`shared_ptr`
 
-4. 在onMassage()中conn参数是收到数据的那个TCP链接，buf是以及收到的数据，buf的数据会积累，直到用户取走(retrieve)数据。time是epoll_wait()的返回时间，这个时间通常比read()发生的时间略早。
+4. 在`onMassage()`中conn参数是收到数据的那个TCP链接，buf是以及收到的数据，buf的数据会积累，直到用户取走(retrieve)数据。time是`epoll_wait()`的返回时间，这个时间通常比`read()`发生的时间略早。
+
+5. Buffer类通过 `findCRLF` 和`findEOL`成员函数在`readerable`区域检索`\r\n`和`EOL`，返回检索到的地址
 
 
 ## 使用muduo库
@@ -28,14 +30,54 @@
 
 测试回射服务器echo(单线程):
 
-本地运行，使用`netcat`进行测试：
+本地运行，使用`netcat`或`telnet`进行测试：
 
    ```shell
-    nc localhost post #post：2007
+    nc localhost post #post：xxx
+    telnet localhost post #post: xxx
    ```
 
-> Netcat 介绍
-> Netcat（简称nc）是一款强大的命令行网络工具，用来在两台机器之间建立TCP/UDP连接，并通过标准的输入输出进行数据的读写
+> `netcat`和`telnet`是一款命令行网络工具，用来在两台机器之间建立TCP/UDP连接，并通过标准的输入输出进行数据的读写
+
+###	4. figner
+
+用muduo实现最简单的7个figner服务端（见muduo/figner/）
+
+Telnet测试：
+
+在一个命令行窗口运行：
+
+
+```shell
+ $ ./finger07.out
+```
+另一个命令行窗口运行：
+
+```shell
+$ telnet localhost 1079
+Trying ::1...
+Connection failed: 拒绝连接Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+muduo
+No such user
+Connection closed by foreign host.
+```
+
+再试一次：
+
+```shell
+$ telnet localhost 1079
+Trying ::1...
+Connection failed: 拒绝连接Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+schen
+Happy and well
+Connection closed by foreign host.
+```
+
+
 
 ## muduo C++
 
@@ -170,6 +212,10 @@
     setA(7)改变a的值时，就会调用了回调函数display，这就差不多是事件监听的思想：首先订阅事件（如这里的把display函数注册为回调函数），然后当事件（这里是a的值变化了）发生
     时，就会自动调用回调函数实现监听。
     
+    ```
+    
+8.  ```c++
+    在std::map<string, string>::iterator中，it->first是key,it->second是value
     ```
 
 ## 参考
