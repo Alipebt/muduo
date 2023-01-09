@@ -14,10 +14,13 @@
    本地运行，使用`netcat`进行测试：
    
    ```shell
-   
+
     nc localhost post #post：2007
 
    ```
+
+    >Netcat 介绍
+    >Netcat（简称nc）是一款强大的命令行网络工具，用来在两台机器之间建立TCP/UDP连接，并通过标准的输入输出进行数据的读写
 ### muduo C++
 
 1. ```c++
