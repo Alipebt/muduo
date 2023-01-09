@@ -23,6 +23,7 @@ void EchoServer::onConnection(const muduo::net::TcpConnectionPtr &conn)
            << conn->localAddress().toIpPort() << " is "
            << (conn->connected() ? "UP" : "DOWN");
 }
+
 void EchoServer::onMassage(const muduo::net::TcpConnectionPtr &conn,
                            muduo::net::Buffer *buf,
                            muduo::Timestamp time)
@@ -31,4 +32,9 @@ void EchoServer::onMassage(const muduo::net::TcpConnectionPtr &conn,
   LOG_INFO << conn->name() << " echo " << msg.size() << " bytes, "
            << "data received at " << time.toString();
   conn->send(msg);
+}
+
+void EchoServer::start()
+{
+  server_.start();
 }
