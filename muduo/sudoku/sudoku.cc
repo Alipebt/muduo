@@ -11,6 +11,12 @@ using namespace std;
 
 const int kCells = 81;
 
+string solveSudoku(string request)
+{
+  string solved = request;
+  return solved;
+}
+
 SudokuServer::SudokuServer(muduo::net::EventLoop *loop,
                            const muduo::net::InetAddress &listenAddr)
     : loop_(loop),
@@ -79,10 +85,4 @@ void SudokuServer::onMassage(const muduo::net::TcpConnectionPtr &conn,
 void SudokuServer::start()
 {
   server_.start();
-}
-
-string solveSudoku(string request)
-{
-  string solved = request;
-  return solved;
 }
