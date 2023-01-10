@@ -79,6 +79,14 @@ Connection closed by foreign host.
 
 
 
+### 5. sudoku
+
+```c++
+muduo::implicit_cast<size_t>(kCells)) // 类型转换<目标类型>（被转换类型）
+```
+
+
+
 ## muduo C++
 
 1. ```c++
@@ -95,30 +103,30 @@ Connection closed by foreign host.
    };
    ```
 
-2.  ```c++
-
+2. ```c++
+    
     在 c/c++ 中，为了解决一些频繁调用的小函数大量消耗栈空间（栈内存）的问题，特别的引入了 inline 修饰符，表示为内联函数。
-
+    
     用模板代替宏。
-
+    
     函数模板：
     template <typename type> ret-type func-name(parameter list)
     {
         // 函数的主体
     }   
-
+    
     类模板：
     template <class type> class class-name {
-
+    
     }
     实例化类模板：类模板名 <真实类型参数表>
     
     在这里，type 是占位符类型名称，可以在类被实例化的时候进行指定。
-
+    
     ```
 
-3.  ```c++
-
+3. ```c++
+    
     mutable的作用有两点：
     （1）保持常量对象中大部分数据成员仍然是“只读”的情况下，实现对个别数据成员的修改；
     （2）使类的const函数可以修改对象的mutable数据成员。
@@ -126,7 +134,7 @@ Connection closed by foreign host.
     ```
 
 4. ```c++
-    
+     
     在构建 shared_ptr 智能指针，可以明确其指向。例如：
     std::shared_ptr<int> p3(new int(10));
     由此，我们就成功构建了一个 shared_ptr 智能指针，其指向一块存有 10 这个 int 类型数据的堆内存空间。
@@ -137,16 +145,17 @@ Connection closed by foreign host.
     既然weak_ptr并不改变其所共享的shared_ptr实例的引用计数，那就可能存在weak_ptr指向的对象被释放掉这种情况。这时，我们就不能使用weak_ptr直接访问对象。那么我们如何判断weak_ptr指向对象是否存在呢？C++中提供了lock函数来实现该功能。如果对象存在，lock()函数返回一个指向共享对象的shared_ptr，否则返回一个空shared_ptr。
     
     ```
-5. ```c++
 
+5. ```c++
+    
     map对象是模板类，需要关键字和存储对象两个模板参数：
     std:map<int, string> personnel;
     这样就定义了一个用int作为索引,并拥有相关联的指向string的指针.
-
+    
     ```
 
 6. ```c++
-
+    
     若p为智能指针对象(如：shared_ptr< int> p)
     p.reset(q) //q为智能指针要指向的新对象
     p.reset(); //释放p中内置的指针指向的空间
@@ -155,7 +164,7 @@ Connection closed by foreign host.
     ```
 
 7. ```c++
-    
+     
     回调函数就是一个通过函数指针调用的函数。如果你把函数的指针（地址）作为参数传递给另一个函数，当这个指针被用来调用其所指向的函数时，我们就说这是回调函数。
     回调函数不是由该函数的实现方直接调用，而是在特定的事件或条件发生时由另外的一方调用的，用于对该事件或条件进行响应。 
     
@@ -213,9 +222,15 @@ Connection closed by foreign host.
     时，就会自动调用回调函数实现监听。
     
     ```
-    
-8.  ```c++
+
+8. ```c++
     在std::map<string, string>::iterator中，it->first是key,it->second是value
+    ```
+
+9. ```c++
+    string中：
+    函数assign()常用在给string类变量赋值.
+    函数erase()常用在处理删除字符串,返回删除后的字符串
     ```
 
 ## 参考
