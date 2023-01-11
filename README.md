@@ -22,11 +22,23 @@
 -lmuduo_base
 ```
 
-###     2. 日志
+### 2. 服务器编程模式
+
+| 方案  |            名称             | 接受新连接 |      网络IO      |     计算任务     |
+| :---: | :-------------------------: | :--------: | :--------------: | :--------------: |
+|   2   |    thread-per-connection    |  1个线程   |      N线程       | 在网络线程中进行 |
+|   5   |        单线程Reactor        |  1个线程   | 在连接线程中进行 | 在连接线程中进行 |
+|   8   |       Reactor+线程池        |  1个线程   | 在连接线程中进行 |      C线程       |
+|   9   |     one loop per thread     |  1个线程   |      C线程       | 在网络线程中进行 |
+|  11   | one loop per thread +线程池 |  1个线程   |      C线程       |      C线程       |
+
+N表示并发连接数目，C是与连接数无关，与CPU数目有关的常数
+
+###     3. 日志
 
 日志可输出到`LOG_INFO`
 
-### 	3. echo
+### 	4. echo
 
 测试回射服务器echo(单线程):
 
@@ -39,7 +51,7 @@
 
 > `netcat`和`telnet`是一款命令行网络工具，用来在两台机器之间建立TCP/UDP连接，并通过标准的输入输出进行数据的读写
 
-###	4. figner
+###	5. figner
 
 用muduo实现最简单的7个figner服务端（见muduo/figner/）
 
@@ -79,7 +91,7 @@ Connection closed by foreign host.
 
 
 
-### 5. sudoku
+### 6. sudoku
 
 ```c++
 muduo::implicit_cast<size_t>(kCells)) // 类型转换<目标类型>（被转换类型）
