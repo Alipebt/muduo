@@ -247,6 +247,9 @@ muduo::implicit_cast<size_t>(kCells)) // 类型转换<目标类型>（被转换�
 
 ## 参考
 
+博客:
+<https://www.cnblogs.com/fortunely/>
+
 常见IO模型参考:
 
 <https://blog.csdn.net/u013256816/article/details/115388239>
