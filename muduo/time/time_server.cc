@@ -1,4 +1,5 @@
-#include <muduo/time/time_server.h>
+#include "time_server.h"
+#include <muduo/net/EventLoop.h>
 #include <muduo/base/Logging.h>
 
 TimeServer::TimeServer(EventLoop *loop,
@@ -7,9 +8,9 @@ TimeServer::TimeServer(EventLoop *loop,
       server_(loop, listenAddr, "TimeServer")
 {
     server_.setConnectionCallback(
-        std::bind(&onConnection, this, _1));
+        std::bind(&TimeServer::onConnection, this, _1));
     server_.setMessageCallback(
-        std::bind(&onMassage, this, _1, _2, _3));
+        std::bind(&TimeServer::onMassage, this, _1, _2, _3));
 }
 
 void TimeServer::start()
@@ -38,4 +39,14 @@ void TimeServer::onMassage(const TcpConnectionPtr &conn,
     muduo::string msg(buf->retrieveAllAsString());
     LOG_INFO << conn->name() << " retrieve " << msg.size() << " bytes ,"
              << " date received at " << time.toString();
+}
+
+int main()
+{
+    LOG_INFO << "pid = " << getpid();
+    EventLoop loop;
+    InetAddress listenAddr(2037);
+    TimeServer server(&loop, listenAddr);
+    server.start();
+    loop.loop();
 }

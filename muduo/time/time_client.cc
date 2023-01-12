@@ -1,4 +1,4 @@
-#include <muduo/time/time_client.h>
+#include "time_client.h"
 #include <muduo/base/Logging.h>
 #include <muduo/base/Timestamp.h>
 
@@ -8,9 +8,9 @@ TimeClient::TimeClient(EventLoop *loop,
       client_(loop, serverAddr, "TimeClient")
 {
     client_.setConnectionCallback(
-        std::bind(&onConnection, this, _1));
+        std::bind(&TimeClient::onConnection, this, _1));
     client_.setMessageCallback(
-        std::bind(&onMassage, this, _1, _2, _3));
+        std::bind(&TimeClient::onMassage, this, _1, _2, _3));
 };
 
 void TimeClient::connect()
