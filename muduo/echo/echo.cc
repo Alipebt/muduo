@@ -37,6 +37,20 @@ void EchoServer::onMassage(const muduo::net::TcpConnectionPtr &conn,
   LOG_INFO << conn->name() << " echo " << msg.size() << " bytes, "
            << "data received at " << time.toString();
 
+  // echo test1 start
+  for (char *c = (char *)msg.c_str(); *c != '\n'; c++)
+  {
+    if (*c >= 'A' && *c <= 'Z')
+    {
+      *c += 32;
+    }
+    else if (*c >= 'a' && *c <= 'z')
+    {
+      *c -= 32;
+    }
+  }
+  // end
+
   conn->send(msg);
 }
 
