@@ -97,6 +97,16 @@ Connection closed by foreign host.
 muduo::implicit_cast<size_t>(kCells)) // 类型转换<目标类型>（被转换类型）
 ```
 
+### 7. filetransfer
+
+```c++
+// 设置内容作为成员变量。这个内容可以是任何数据，主要是用着一个临时存储作用。
+conn->setContext(); 
+//取出该成员变量
+conn->getContext();
+```
+
+
 
 
 ## muduo C++
