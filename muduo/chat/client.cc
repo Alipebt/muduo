@@ -2,9 +2,13 @@
 
 #include <muduo/net/TcpClient.h>
 #include <muduo/base/Mutex.h>
+#include <muduo/net/EventLoopThread.h>
+
+#include <iostream>
 
 using namespace muduo;
 using namespace muduo::net;
+using namespace std;
 
 class ChatClient : muduo::noncopyable
 {
@@ -28,7 +32,7 @@ public:
     }
     void disconnect()
     {
-        // client_.disconnect();
+        client_.disconnect();
     }
     void write(const StringPiece &message)
     {
@@ -71,3 +75,28 @@ private:
     MutexLock mutex_;
     LengthHeaderCodec codec_;
 };
+
+int main(int argc, char *argv[])
+{
+    LOG_INFO << "pid = " << getpid();
+    if (argc > 2)
+    {
+        EventLoopThread loopThread;
+        int32_t port = static_cast<int32_t>(atoi(argv[2]));
+        InetAddress serverAddr(argv[1], port);
+
+        ChatClient client(loopThread.startLoop(), serverAddr);
+        client.connect();
+
+        string line;
+        while (getline(cin, line))
+        {
+            client.write(line);
+        }
+        client.disconnect();
+    }
+    else
+    {
+        printf("Usage : %s host_ip port\n", argv[0]);
+    }
+}

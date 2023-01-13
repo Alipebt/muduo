@@ -9,7 +9,7 @@ public:
                                const muduo::string &message,
                                muduo::Timestamp)>
         StringMessageCallBack;
-    explicit LengthHeaderCodec(const StringMessageCallBack cb)
+    explicit LengthHeaderCodec(const StringMessageCallBack &cb)
         : messageCallback_(cb)
     {
     }
@@ -33,8 +33,12 @@ public:
         while (buf->readableBytes() >= kHeaderLen) // kHeaderLen==4
         {
             const void *data = buf->peek();
-            int32_t be32 = buf->peekInt32();
-            const int32_t len = muduo::net::sockets::networkToHost32(be32);
+
+            const int32_t len = buf->peekInt32(); //**************************************
+
+            // int32_t be32 = *static_cast<const int32_t *>(data);
+            // const int32_t len = muduo::net::sockets::networkToHost32(be32);
+
             if (len > 65536 || len < 0)
             {
                 LOG_INFO << "Invalid length " << len;
