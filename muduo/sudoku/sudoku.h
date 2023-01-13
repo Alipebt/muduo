@@ -9,7 +9,7 @@ public:
 
 private:
     void onConnection(const muduo::net::TcpConnectionPtr &conn);
-    void onMassage(const muduo::net::TcpConnectionPtr &conn,
+    void onMessage(const muduo::net::TcpConnectionPtr &conn,
                    muduo::net::Buffer *buf,
                    muduo::Timestamp time);
 

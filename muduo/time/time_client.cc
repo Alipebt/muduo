@@ -10,7 +10,7 @@ TimeClient::TimeClient(EventLoop *loop,
     client_.setConnectionCallback(
         std::bind(&TimeClient::onConnection, this, _1));
     client_.setMessageCallback(
-        std::bind(&TimeClient::onMassage, this, _1, _2, _3));
+        std::bind(&TimeClient::onMessage, this, _1, _2, _3));
 };
 
 void TimeClient::connect()
@@ -29,7 +29,7 @@ void TimeClient::onConnection(const TcpConnectionPtr &conn)
     }
 }
 
-void TimeClient::onMassage(const TcpConnectionPtr &conn,
+void TimeClient::onMessage(const TcpConnectionPtr &conn,
                            Buffer *buf,
                            Timestamp receiveTime)
 {

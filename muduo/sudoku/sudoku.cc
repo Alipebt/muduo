@@ -25,7 +25,7 @@ SudokuServer::SudokuServer(muduo::net::EventLoop *loop,
   server_.setConnectionCallback(
       std::bind(&SudokuServer::onConnection, this, _1));
   server_.setMessageCallback(
-      std::bind(&SudokuServer::onMassage, this, _1, _2, _3));
+      std::bind(&SudokuServer::onMessage, this, _1, _2, _3));
 }
 
 void SudokuServer::onConnection(const muduo::net::TcpConnectionPtr &conn)
@@ -35,7 +35,7 @@ void SudokuServer::onConnection(const muduo::net::TcpConnectionPtr &conn)
            << (conn->connected() ? "UP" : "DOWN");
 }
 
-void SudokuServer::onMassage(const muduo::net::TcpConnectionPtr &conn,
+void SudokuServer::onMessage(const muduo::net::TcpConnectionPtr &conn,
                              muduo::net::Buffer *buf,
                              muduo::Timestamp time)
 {

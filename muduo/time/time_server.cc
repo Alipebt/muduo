@@ -10,7 +10,7 @@ TimeServer::TimeServer(EventLoop *loop,
     server_.setConnectionCallback(
         std::bind(&TimeServer::onConnection, this, _1));
     server_.setMessageCallback(
-        std::bind(&TimeServer::onMassage, this, _1, _2, _3));
+        std::bind(&TimeServer::onMessage, this, _1, _2, _3));
 }
 
 void TimeServer::start()
@@ -32,7 +32,7 @@ void TimeServer::onConnection(const TcpConnectionPtr &conn)
     }
 }
 
-void TimeServer::onMassage(const TcpConnectionPtr &conn,
+void TimeServer::onMessage(const TcpConnectionPtr &conn,
                            Buffer *buf,
                            Timestamp time)
 {

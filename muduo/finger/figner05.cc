@@ -6,11 +6,12 @@
 using namespace muduo;
 using namespace muduo::net;
 
-void onMassage(const TcpConnectionPtr &conn,
+void onMessage(const TcpConnectionPtr &conn,
                Buffer *buf,
                Timestamp time)
 {
     if (buf->findCRLF())
+
     {
         conn->send("No such user\r\n");
         conn->shutdown();
@@ -21,7 +22,7 @@ int main()
 {
     EventLoop loop;
     TcpServer server(&loop, InetAddress(1079), "Figner");
-    server.setMessageCallback(onMassage);
+    server.setMessageCallback(onMessage);
     server.start();
     loop.loop();
 }
