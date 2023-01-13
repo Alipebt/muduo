@@ -1,7 +1,7 @@
 /*
 
-如果对方恶意不接受文件，此方法会大量占用文件描述符。（后有解决方法，限制最大并发连接数）
-满足几乎所有健壮性
+同downlode2
+downlode3避免了手动调用::fclose()
 
 */
 
@@ -21,6 +21,7 @@ void onHighWaterMark(const TcpConnectionPtr &conn, size_t len)
 
 const int kBufSize = 64 * 1024;
 const char *g_file = NULL;
+typedef std::shared_ptr<FILE> FilePtr;
 
 void onConnection(const TcpConnectionPtr &conn)
 {
@@ -37,7 +38,8 @@ void onConnection(const TcpConnectionPtr &conn)
         FILE *fp = ::fopen(g_file, "rb");
         if (fp)
         {
-            conn->setContext(fp); // 设置内容。这个内容可以是任何数据，主要是用着一个临时存储作用。
+            FilePtr ctx(fp, ::fclose);
+            conn->setContext(ctx);
             char buf[kBufSize];
             size_t nread = ::fread(buf, 1, kBufSize, fp);
             conn->send(buf, nread); // 存在WriteCompleteCallBack,在此重复写文件。
@@ -48,33 +50,19 @@ void onConnection(const TcpConnectionPtr &conn)
             LOG_INFO << "FileServer - no such file";
         }
     }
-    else
-    {
-        if (!conn->getContext().empty())
-        {
-            FILE *fp = boost::any_cast<FILE *>(conn->getContext());
-            if (fp)
-            {
-                ::fclose(fp);
-            }
-        }
-    }
 }
 
 void onWriteComplete(const TcpConnectionPtr &conn)
 {
-    FILE *fp = boost::any_cast<FILE *>(conn->getContext());
+    const FilePtr &fp = boost::any_cast<const FilePtr &>(conn->getContext());
     char buf[kBufSize];
-    size_t nread = ::fread(buf, 1, kBufSize, fp);
+    size_t nread = ::fread(buf, 1, kBufSize, get_pointer(fp));
     if (nread > 0)
     {
         conn->send(buf, nread);
     }
     else
     {
-        ::fclose(fp);
-        fp = NULL;
-        conn->setContext(fp);
         conn->shutdown();
         LOG_INFO << "FileServer - done ";
     }

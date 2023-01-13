@@ -15,12 +15,27 @@
 
 ## 使用muduo库
 
-### 	1.编译时应链接相应的静态库
+### 	1.编译与测试
+
+编译时应链接相应的静态库
 
 ```shell
 -lmuduo_net
 -lmuduo_base
 ```
+
+检查文件描述符及其状态
+
+```shell
+#通过port查找PID
+ps -uax | grep port
+或
+lsof -i:port
+#通过PID查找
+
+```
+
+
 
 ### 2. 服务器编程模式
 
@@ -162,12 +177,18 @@ conn->getContext();
     由此，我们就成功构建了一个 shared_ptr 智能指针，其指向一块存有 10 这个 int 类型数据的堆内存空间。
     
     weak_ptr是为了配合shared_ptr而引入的一种智能指针，它指向一个由shared_ptr管理的对象而不影响所指对象的生命周期，也就是将一个weak_ptr绑定到一个shared_ptr不会改变shared_ptr的引用计数。不论是否有weak_ptr指向，一旦最后一个指向对象的shared_ptr被销毁，对象就会被释放。
+        
     当我们创建一个weak_ptr时，需要用一个shared_ptr实例来初始化weak_ptr，由于是弱共享，weak_ptr的创建并不会影响shared_ptr的引用计数值。
     
     既然weak_ptr并不改变其所共享的shared_ptr实例的引用计数，那就可能存在weak_ptr指向的对象被释放掉这种情况。这时，我们就不能使用weak_ptr直接访问对象。那么我们如何判断weak_ptr指向对象是否存在呢？C++中提供了lock函数来实现该功能。如果对象存在，lock()函数返回一个指向共享对象的shared_ptr，否则返回一个空shared_ptr。
-    
-    ```
-
+        
+   在初始化 shared_ptr 智能指针时，还可以自定义所指堆内存的释放规则，这样当堆内存的引用计数为 0 时，会优先调用我们自定义的释放规则。
+   std::shared_ptr<int> p7(new int[10], deleteInt);
+   std::shared_ptr<int> p7(new int[10], [](int* p) {delete[]p; });
+   
+   
+   ```
+   
 5. ```c++
     
     map对象是模板类，需要关键字和存储对象两个模板参数：
