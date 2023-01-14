@@ -126,8 +126,66 @@ conn->getContext();
 muduo::net::Buffer->retrieve(kHeaderLen); // 从头部取走数据，删除取走部分并返回该部分
 ```
 
+### 9. Protobuf
+
+编译porot文件:
+
+```shell
+protoc xxx.proto --cpp_out=./	#编译为 xxx 到 ./ 目录下（c++格式）
+```
+
+编译源文件时需链接:
+
+```shell
+-lprotobuf
+```
 
 
+
+接收双方在收到`Protobuf`二进制数据流之后，如何自动创建具体类型的`Protobuf Message`对象，并用收到的数据填充该`Message`对象（反序列化）？（即使`proto`文件更新，也会自动填入新的`Message`类型，不需要更新用户代码）
+
+​	1.用`DescriptorPool::gennerated_pool`找到一个`DescriptorPool`对象，它包含了程序编译的时候所链接的全部`Protobuf Message types`。
+
+​	2.根据`type name`用`DescriptorPool::FindMessageTypeByName()`查找`Descriptor`。
+
+​	3.再用`MessageFactory::generated_factory()`找到`MessageFactory`对象，它能创建程序编译时候所链接的全部`Protobuf Message types`。
+
+​	4.然后用`MessageFactory::GetPrototype()`找到具体`Message type`的`default instance`。
+
+​	5.最后用`prototype->New()`创建对象。
+
+示例如下：
+
+```c++
+Message* createMessage(const std::string& typeName){
+    Message* message = NULL;
+    const Descriptor* descriptor
+        = DescroptorPool::generated_pool()->FindMessageTypeByName(typeName);
+    if(descriptor){
+        const Message* prototype
+            = MessageFactory::generated_factory()->GetPrototype(descriptor);
+        if(prototype){
+            message = prototype->New(); 
+        }
+    }
+    return message;
+}
+```
+
+
+
+调用方式：
+
+```c++
+Message* newQuery = createMessage("muduo.Query");	//上述返回需要delete,muduo里不需要
+assert(newQuery != NULL);
+assert(typeid(*newQuery) == typeid(muduo::Query::default_instance()));
+cout << "createMessage(\"muduo.Query\") = " << newQuery << endl;
+```
+
+### 10.Discard
+
+`AtomicInt64` ，`AtomicInt32`为原子数据类型，线程安全
 
 ## muduo C++
 
@@ -294,7 +352,7 @@ muduo::net::Buffer->retrieve(kHeaderLen); // 从头部取走数据，删除取�
 11. ```c++
      类模版std::function是一种通用、多态的函数封装。 
      std::function的实例可以对任何可以调用的目标实体进行存储、复制、和调用操作，这些目标实体包括普通函数、Lambda表达式、函数指针、以及其它函数对象等。
-     ```
+    ```
 
 12. 
 
@@ -311,3 +369,7 @@ muduo::net::Buffer->retrieve(kHeaderLen); // 从头部取走数据，删除取�
 muduo线程池的one loop per thread:
 
 <https://blog.csdn.net/m0_47891203/article/details/127084649?ops_request_misc=&request_id=&biz_id=102&utm_term=one%20loop%20per%20thread%E6%A8%A1%E5%9E%8B&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-2-127084649.142^v68^js_top,201^v4^add_ask,213^v2^t3_esquery_v2>
+
+Protocol Buffers C++:
+
+<https://blog.csdn.net/K346K346/article/details/51754431>
