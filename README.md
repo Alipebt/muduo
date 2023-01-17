@@ -189,13 +189,90 @@ cout << "createMessage(\"muduo.Query\") = " << newQuery << endl;
 
 ### 11. twecho
 
+一种心跳机制
+
 `circular_buffer` 中文意为环形缓冲区，这是一个固定大小的缓冲区，它被定义成一个环形，当缓冲区满了后，新来的数据会覆盖掉旧的数据。
 
 `unordered_set`的`hash`会去重，所以疯狂`echo`并不会顶掉原有的`bucket`
 
 ## muduo 源码
 
+### 1. EventLoop class
 
+主要由开启事件循环和检测访问事件循环是否正确。（one loop per thread）
+
+主要函数：
+
+```c++
+loop()
+```
+
+其中构造函数会记录当前线程信息，在`loop()`中会自动检测线程正确性    
+
+### 2. Channel class
+
+每个`Channel`对象只属于一个`Evenloop`，也只属于一个IO线程（不需加锁）。
+
+每个`Channel`只负责一个`fd`的IO事件分发（回调），它不拥有该`fd`。
+
+用户一般只使用（提供给`chennel`对象使用）：
+
+```c++
+set*CallBack()
+enableReading()
+```
+
+`Channel class`中的`event_`是它关心的事件，由用户设置，
+
+`revents_`是活动事件，由`EventLoop/Poller`设置
+
+`Channel::handleEvent()`由`EventLoop::loop()`调用，它会根据`revents_`的值调用不同的回调函数
+
+`ChannelMap`是从`fd`到`Channel*`的映射
+
+`updateChannel()`通过新`Channel`更新`pollfds_`列表
+
+### 3. Poller class
+
+`Poller class`拥有并管理`Channel`的一个列表，`pollfds_`为监听的fd列表
+
+`Poller::poll()`调用poll(2)来获取当前活动的IO事件，然后再用`fillActiveChannels()`遍历`pollsds_`，找出有活动事件的`fd`,把它对应的`Channel`填入`activeChannels()`
+
+### 4. EventLoop改动
+
+现在`EventLoop::loop()`有了真正的工作内容，它调用`Poller::poll()`获得当前活动事件的`Channel`列表，然后依次调用每个`Channel`的`handleEvent()`函数
+
+### 5. TimerQueue
+
+该接口提供给`EventLoop`使用（封装为了`runAt()`,`runAfter()`,`runEvery()`）
+
+### 6. EventLoop::runInLoop()
+
+该函数实现了在它的IO线程内执行某个用户任务回调，即`EventLoop::runInLoop(const Functor &cb)`
+
+如果用户在当前IO线程调用这个函数，回调会同步进行，如果用户在其他线程调用`runInLoop()`，`cb`会被加入队列，等待IO线程唤醒。
+
+由于IO线程平时阻塞在事件循环`EventLoop::loop()`的`poll(2)`调用中，为了让IO线程能立即执行用户回调，先把事件放入`pendingFunctors_`(一个函数列表)，然后在`loop()`循环中增加一行代码，调用`doPendingFunctors()`，它不是简单的在临界区依次调用`Functor`（vector的访问会阻塞其他线程，如添加新回调事件），而是把回调列表`swap()`到局部变量中。
+
+### 7. Acceptor class
+
+该类用于`accept`新`TCP`连接。它供`TcpServer`使用。
+
+`Acceptor`数据成员包括`Socket`，`Channel`等。
+
+`Acceptor`的`socket`是`listening socket`即`server socket`。用其创建的`acceptChannel_`用于观察此`socket`上的readable事件，并回调`Acceptor::handleRead()`。该回调会用`accept(2)`来接受新连接。（用`acceptChannel_.enableReading()`开启观察，用户直接调用`Acceptor::listen()`即可，后者包含了前者）
+
+`Acceptor`的构造函数和`Acceptor::listen()`调用`socket()`,`bind()`,`listen()`等一系列`Socket API`。
+
+其中`InetAddress class`是对`struct sockaddr_in`的简单封装。
+
+构造函数中的`createNonblockingOrDie()`用来创建非阻塞socket。
+
+### 8. TcpServer class
+
+`TcpServer class`功能是管理`accept(2)`获得的`TcpConnection`。`TcpServer`是直接供用户使用的，用户只需要设置好callback,再调用`start()`即可。
+
+`TcpServer`内部使用`Acceptor`来获得新连接的`fd`。它保存用户提供的`Connection/Message Callback`,在新建`TcpConnection`时会原样传给该`TcpConnection`。`TcpServer`持有目前存活的`TcpConnection`的`shared_ptr`（定义为`TcpConnectionPtr`）
 
 ## muduo C++
 
