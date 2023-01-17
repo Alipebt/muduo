@@ -274,6 +274,22 @@ enableReading()
 
 `TcpServer`内部使用`Acceptor`来获得新连接的`fd`。它保存用户提供的`Connection/Message Callback`,在新建`TcpConnection`时会原样传给该`TcpConnection`。`TcpServer`持有目前存活的`TcpConnection`的`shared_ptr`（定义为`TcpConnectionPtr`）
 
+新连接到达时，`Acceptor`回调`newConnection()`，后者会创建`TcpConnection`对象`conn`，把它加入`ConnectionMap`，设置好callback,再调用`conn->connectionEstablished()`，其中会回调用户提供的`ConnectionCallBack`
+
+### 9. TcpConnection class
+
+`TcpConnection`使用`Channel`来获得`socket`上的IO事件，它会自己处理writeable事件，而把readable事件通过`MessageCallback`传给客户。
+
+`TcpConnection`拥有` TCP socket`，它的析构函数会`close(fd)`，所以它表示的是“一次`TCP`连接”，一旦断开，这个对象就没用了。另外，`TcpConnection`没有发起连接的功能，其构造函数是已经建立好的`socket fd`。
+
+### 10. Connector
+
+`Connector`只负责建立`socket`连接，不负责创建`TcpConnection`对象
+
+### 11. epoll
+
+`poll(2)`返回值为整个文件描述符数组，用户需要遍历数组寻找哪些文件描述符上有IO事件，而`epoll_wait(2)`返回的是活动`fd`的列表。
+
 ## muduo C++
 
 1. ```c++
