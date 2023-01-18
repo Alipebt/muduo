@@ -1,6 +1,6 @@
 # 笔记
 
-##  注释：
+##  1 注释：
 
 1. `TcpConnection`的`peerAddress()`和`localAddress()`成员函数分别返回对方和本地的地址(以`InetAddress`对象表示IP和port)
 
@@ -13,9 +13,9 @@
 5. Buffer类通过 `findCRLF` 和`findEOL`成员函数在`readerable`区域检索`\r\n`和`EOL`，返回检索到的地址
 
 
-## 使用muduo库
+## 2 使用muduo库
 
-### 	1.编译与测试
+### 	2.1 编译与测试
 
 编译时应链接相应的静态库
 
@@ -36,7 +36,7 @@ lsof -i:port
 
 
 
-### 2. 服务器编程模式
+### 2.2 服务器编程模式
 
 | 方案  |            名称             | 接受新连接 |      网络IO      |     计算任务     |
 | :---: | :-------------------------: | :--------: | :--------------: | :--------------: |
@@ -48,11 +48,11 @@ lsof -i:port
 
 N表示并发连接数目，C是与连接数无关，与CPU数目有关的常数
 
-###     3. 日志
+###     2.3 日志
 
 日志可输出到`LOG_INFO`
 
-### 	4. echo
+### 	2.4 echo
 
 测试回射服务器echo(单线程):
 
@@ -65,7 +65,7 @@ N表示并发连接数目，C是与连接数无关，与CPU数目有关的常数
 
 > `netcat`和`telnet`是一款命令行网络工具，用来在两台机器之间建立TCP/UDP连接，并通过标准的输入输出进行数据的读写
 
-###	5. figner
+###	2.5 figner
 
 用muduo实现最简单的7个figner服务端（见muduo/figner/）
 
@@ -105,13 +105,13 @@ Connection closed by foreign host.
 
 
 
-### 6. sudoku
+### 2.6 sudoku
 
 ```c++
 muduo::implicit_cast<size_t>(kCells)) // 类型转换<目标类型>（被转换类型）
 ```
 
-### 7. filetransfer
+### 2.7 filetransfer
 
 ```c++
 // 设置内容作为成员变量。这个内容可以是任何数据，主要是用着一个临时存储作用。
@@ -120,13 +120,13 @@ conn->setContext();
 conn->getContext();
 ```
 
-### 8. chat
+### 2.8 chat
 
 ```c++
 muduo::net::Buffer->retrieve(kHeaderLen); // 从头部取走数据，删除取走部分并返回该部分
 ```
 
-### 9. Protobuf
+### 2.9 Protobuf
 
 编译porot文件:
 
@@ -183,11 +183,11 @@ assert(typeid(*newQuery) == typeid(muduo::Query::default_instance()));
 cout << "createMessage(\"muduo.Query\") = " << newQuery << endl;
 ```
 
-### 10.Discard
+### 2.10 Discard
 
 `AtomicInt64` ，`AtomicInt32`为原子数据类型，线程安全
 
-### 11. twecho
+### 2.11 twecho
 
 一种心跳机制
 
@@ -195,9 +195,9 @@ cout << "createMessage(\"muduo.Query\") = " << newQuery << endl;
 
 `unordered_set`的`hash`会去重，所以疯狂`echo`并不会顶掉原有的`bucket`
 
-## muduo 源码
+## 3 muduo 源码
 
-### 1. EventLoop class
+### 3.1 EventLoop class
 
 主要由开启事件循环和检测访问事件循环是否正确。（one loop per thread）
 
@@ -209,7 +209,7 @@ loop()
 
 其中构造函数会记录当前线程信息，在`loop()`中会自动检测线程正确性    
 
-### 2. Channel class
+### 3.2 Channel class
 
 每个`Channel`对象只属于一个`Evenloop`，也只属于一个IO线程（不需加锁）。
 
@@ -232,21 +232,21 @@ enableReading()
 
 `updateChannel()`通过新`Channel`更新`pollfds_`列表
 
-### 3. Poller class
+### 3.3 Poller class
 
 `Poller class`拥有并管理`Channel`的一个列表，`pollfds_`为监听的fd列表
 
 `Poller::poll()`调用poll(2)来获取当前活动的IO事件，然后再用`fillActiveChannels()`遍历`pollsds_`，找出有活动事件的`fd`,把它对应的`Channel`填入`activeChannels()`
 
-### 4. EventLoop改动
+### 3.4 EventLoop改动
 
 现在`EventLoop::loop()`有了真正的工作内容，它调用`Poller::poll()`获得当前活动事件的`Channel`列表，然后依次调用每个`Channel`的`handleEvent()`函数
 
-### 5. TimerQueue
+### 3.5 TimerQueue
 
 该接口提供给`EventLoop`使用（封装为了`runAt()`,`runAfter()`,`runEvery()`）
 
-### 6. EventLoop::runInLoop()
+### 3.6 EventLoop::runInLoop()
 
 该函数实现了在它的IO线程内执行某个用户任务回调，即`EventLoop::runInLoop(const Functor &cb)`
 
@@ -254,7 +254,7 @@ enableReading()
 
 由于IO线程平时阻塞在事件循环`EventLoop::loop()`的`poll(2)`调用中，为了让IO线程能立即执行用户回调，先把事件放入`pendingFunctors_`(一个函数列表)，然后在`loop()`循环中增加一行代码，调用`doPendingFunctors()`，它不是简单的在临界区依次调用`Functor`（vector的访问会阻塞其他线程，如添加新回调事件），而是把回调列表`swap()`到局部变量中。
 
-### 7. Acceptor class
+### 3.7 Acceptor class
 
 该类用于`accept`新`TCP`连接。它供`TcpServer`使用。
 
@@ -268,7 +268,7 @@ enableReading()
 
 构造函数中的`createNonblockingOrDie()`用来创建非阻塞socket。
 
-### 8. TcpServer class
+### 3.8 TcpServer class
 
 `TcpServer class`功能是管理`accept(2)`获得的`TcpConnection`。`TcpServer`是直接供用户使用的，用户只需要设置好callback,再调用`start()`即可。
 
@@ -276,21 +276,21 @@ enableReading()
 
 新连接到达时，`Acceptor`回调`newConnection()`，后者会创建`TcpConnection`对象`conn`，把它加入`ConnectionMap`，设置好callback,再调用`conn->connectionEstablished()`，其中会回调用户提供的`ConnectionCallBack`
 
-### 9. TcpConnection class
+### 3.9 TcpConnection class
 
 `TcpConnection`使用`Channel`来获得`socket`上的IO事件，它会自己处理writeable事件，而把readable事件通过`MessageCallback`传给客户。
 
 `TcpConnection`拥有` TCP socket`，它的析构函数会`close(fd)`，所以它表示的是“一次`TCP`连接”，一旦断开，这个对象就没用了。另外，`TcpConnection`没有发起连接的功能，其构造函数是已经建立好的`socket fd`。
 
-### 10. Connector
+### 3.10 Connector
 
 `Connector`只负责建立`socket`连接，不负责创建`TcpConnection`对象
 
-### 11. epoll
+### 3.11 epoll
 
 `poll(2)`返回值为整个文件描述符数组，用户需要遍历数组寻找哪些文件描述符上有IO事件，而`epoll_wait(2)`返回的是活动`fd`的列表。
 
-## muduo C++
+## 4 muduo C++
 
 1. ```c++
    // 基类
